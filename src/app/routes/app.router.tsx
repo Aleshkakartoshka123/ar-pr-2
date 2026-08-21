@@ -1,8 +1,21 @@
-export type Position = [longitude: number,latitude:number];
+import { Navigate,Route,Routes } from 'react-router-dom';
+import {lazy,Suspense} from "react";
 
-export interface Zone{
-    id:string;
-    name: string;
-    coordinates:Position[];
-    updatedAt:string;
+const MapPage = lazy(() => import ("@/pages/map/ui/page").then((module)=>
+    ({default:module.MapPage}))
+)
+
+
+export function AppRouter()
+{
+    return(
+        <Routes>
+            <Route path="/map" element ={
+                <Suspense fallback={<p>Загрузка</p>}>
+                    <MapPage />
+                </Suspense>
+            }  />
+            <Route path="*" element={<span>Неизвестная страница</span>}/>
+        </Routes>
+    )
 }
