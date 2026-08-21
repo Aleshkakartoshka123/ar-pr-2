@@ -1,5 +1,5 @@
 import type {Zone,Position} from '@/entities/zone';
-import {GeoJSONSource, LngLatBounds,Map,MapMouseEvent,NavigationControl,type FilterSpecification,type IControl,type MapLayerEventType,type MapLayerMouseEvent,type StyleSpecification,} from "maplibre-gl";
+import {GeoJSONSource, LngLatBounds,Map,MapMouseEvent,NavigationControl,type FilterSpecification,type IControl,type MapLayerMouseEvent,type StyleSpecification,} from "maplibre-gl";
 import type { Feature, FeatureCollection,Polygon } from 'geojson';
 import MapDrawBox from "@mapbox/mapbox-gl-draw";
 import { useEffect, useRef } from 'react';
@@ -22,9 +22,11 @@ const SELECTED_FILL_LAYER="selectes-zone-fill";
 const SELECTED_LINE_LAYER="selected-zone-line";
 
 
-const osmStyle = {
+const osmStyle :StyleSpecification = {
     version: 8,
-    sources: {osm:{type:"raster",tiles:["https://tile.openstreetmap.org/{z}/{x}/{y}.png"],tileSize:256,
+    sources: {osm:{type:"raster",
+        tiles:["https://tile.openstreetmap.org/{z}/{x}/{y}.png"],
+        tileSize:256,
         attribution:"Open Streep Map"
         }
     },
@@ -75,7 +77,7 @@ function getDrawStyles(){
                 }
             }
         }
-        if (layer.type === "line") return layer;
+        if (layer.type !== "line") return layer;
         return{
             ...layer,
             paint:
@@ -144,10 +146,16 @@ export function ZonesMap ({
             const zoneId = event.features?.[0]?.properties?.id
             if(typeof zoneId === "string") onSelectZoneRef.current(zoneId);
         }
+
         const clearSelection = (event:MapMouseEvent) => {
             if(isCreatingRef.current) return;
-            const features = map.queryRenderedFeatures(event.point,{layers:[ZONE_FILL_LAYER]});
+            const features = map.queryRenderedFeatures(
+                event.point,{layers:[ZONE_FILL_LAYER]
+
+                });
+                if(features.length ===0) onSelectZoneRef.current(null);
         }
+
         const showPointer = () => {map.getCanvas().style.cursor = "pointer";};
         const resetPointer = () => {map.getCanvas().style.cursor = "";};
 
@@ -224,6 +232,6 @@ export function ZonesMap ({
 },[drawRevision,isCreating]);
 
 
-    return <div ref={containerRef} className="zones-map"> </div>
+    return <div ref={containerRef} className="!absolute inset-0"> </div>
 }
 
