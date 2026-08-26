@@ -1,1 +1,1 @@
-export type {Position,Zone} from "./model/types"
+export type { Position, Zone } from "./model/types"
